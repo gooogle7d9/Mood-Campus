@@ -1,0 +1,20 @@
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const KEY='moodCampusEntries'; let selected=null, timerId=null;
+const iso=d=>d.toISOString().slice(0,10); const today=iso(new Date());
+function getEntries(){return JSON.parse(localStorage.getItem(KEY)||'[]')}
+function setEntries(v){localStorage.setItem(KEY,JSON.stringify(v))}
+$$('.role').forEach(b=>b.addEventListener('click',()=>{$$('.role').forEach(x=>x.classList.toggle('active',x===b)); $('#studentView').classList.toggle('hidden',b.dataset.view!=='student'); $('#staffView').classList.toggle('hidden',b.dataset.view!=='staff'); if(b.dataset.view==='staff') renderStaff()}));
+$$('.moods button').forEach(b=>b.addEventListener('click',()=>{selected={score:+b.dataset.score,emoji:b.dataset.emoji}; $$('.moods button').forEach(x=>x.classList.toggle('selected',x===b)); $('#saveMood').disabled=false; $('#supportPanel').classList.toggle('hidden',selected.score>2)}));
+$('#saveMood').addEventListener('click',()=>{let e=getEntries().filter(x=>x.date!==today);e.push({date:today,score:selected.score,emoji:selected.emoji,note:$('#note').value.trim()});setEntries(e);$('#saveMsg').textContent='已儲存 ✓';renderStudent()});
+function lastDays(n){return Array.from({length:n},(_,i)=>{let d=new Date();d.setDate(d.getDate()-(n-1-i));return iso(d)})}
+function renderStudent(){let e=getEntries(), map=Object.fromEntries(e.map(x=>[x.date,x]));let days=lastDays(30),vals=days.map(d=>map[d]?.score||0),filled=vals.filter(Boolean);$('#monthAvg').textContent=filled.length?(filled.reduce((a,b)=>a+b,0)/filled.length).toFixed(1):'--';$('#studentChart').innerHTML=days.map((d,i)=>`<div class="bar" style="height:${vals[i]?vals[i]*18:3}% ;opacity:${vals[i]?1:.16}" data-label="${d.slice(5)} · ${vals[i]||'沒有記錄'}"></div>`).join('');let streak=0;for(let d of [...lastDays(30)].reverse()){if(map[d])streak++;else break}$('#streakNum').textContent=streak;if(map[today]){$('#saveMsg').textContent='今日已記錄 '+map[today].emoji}}
+const classData={ '1A':[3.7,3.5,3.4,3.1,2.9,2.8,2.7], '1B':[3.2,3.5,3.6,3.8,3.7,3.9,4.0], '2A':[4.0,3.8,3.6,3.7,3.5,3.6,3.4]};
+function renderStaff(){let c=$('#classSelect').value,v=classData[c],avg=v.at(-1);$('#classAvg').textContent=avg.toFixed(1);$('#responseCount').textContent=c==='1A'?28:c==='1B'?26:30;$('#riskCount').textContent=c==='1A'?2:c==='2A'?1:0;$('#trendBadge').textContent=v.at(-1)<v[0]?'↘ 情緒下降':'↗ 大致穩定';$('#classChart').innerHTML=v.map((x,i)=>`<div class="bar" style="height:${x*18}%" data-label="${lastDays(7)[i].slice(5)} · ${x}"></div>`).join('');let alerts=c==='1A'?[['S-014','連續7日選擇 ☹️','高'],['班級趨勢','3日平均低於 3.0','中']]:c==='2A'?[['S-208','連續7日低分，需要人工覆核','中']]:[];$('#alerts').innerHTML=alerts.length?alerts.map(a=>`<div class="alert"><div><b>${a[0]} · ${a[2]}度提示</b><p>${a[1]}。系統只作提示，請按校本程序跟進。</p></div><button>標記跟進</button></div>`).join(''):'<p class="muted">目前沒有自動提示。</p>'}
+$('#classSelect').addEventListener('change',renderStaff);$('#clearDemo').addEventListener('click',()=>{localStorage.removeItem(KEY);renderStudent()});
+function openModal(kind){$('#modal').classList.remove('hidden');$('#breathing').classList.toggle('hidden',kind!=='med');$('#eegPanel').classList.toggle('hidden',kind!=='eeg');$('#modalTitle').textContent=kind==='med'?'2分鐘呼吸練習':'連接 EEG 設備（示範）';if(kind==='med')startTimer()}
+$('#startMeditation').addEventListener('click',()=>openModal('med'));$('#connectEEG').addEventListener('click',()=>openModal('eeg'));$('#closeModal').addEventListener('click',closeModal);$('#stopMeditation').addEventListener('click',closeModal);
+function closeModal(){clearInterval(timerId);$('#modal').classList.add('hidden')}
+function startTimer(){clearInterval(timerId);let t=120;timerId=setInterval(()=>{t--;$('#timer').textContent=`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;if(t<=0){clearInterval(timerId);$('#timer').textContent='完成 ✓'}},1000)}
+$('#simulateConnect').addEventListener('click',()=>{let b=$('#simulateConnect');b.disabled=true;$('#eegStatus').textContent='正在搜尋附近設備…';setTimeout(()=>{$('#eegStatus').textContent='已連接：Demo EEG 01（模擬）';b.disabled=false},1400)});
+renderStudent();renderStaff();

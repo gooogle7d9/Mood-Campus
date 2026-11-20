@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#315b52">
+  <title>心晴校園 Mood Campus</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div><h1>心晴校園</h1><p>Mood Campus · 學校情緒支援示範</p></div>
+  <nav aria-label="角色切換">
+    <button class="role active" data-view="student">學生</button>
+    <button class="role" data-view="staff">老師／社工</button>
+  </nav>
+</header>
+<main>
+<section id="studentView" class="view">
+  <div class="hero card">
+    <div><span class="eyebrow">每日一分鐘</span><h2>你今日心情點呀？</h2><p>選擇最接近你此刻感受的表情。</p></div>
+    <div class="streak" id="streakBox"><b id="streakNum">0</b><span>天記錄</span></div>
+  </div>
+  <section class="card">
+    <h3>今日情緒日記</h3>
+    <div class="moods" role="radiogroup" aria-label="選擇心情">
+      <button data-score="5" data-emoji="😄" aria-label="非常開心">😄<span>非常開心</span></button>
+      <button data-score="4" data-emoji="🙂" aria-label="開心">🙂<span>開心</span></button>
+      <button data-score="3" data-emoji="😐" aria-label="一般">😐<span>一般</span></button>
+      <button data-score="2" data-emoji="😟" aria-label="唔開心">😟<span>唔開心</span></button>
+      <button data-score="1" data-emoji="☹️" aria-label="非常唔開心">☹️<span>非常唔開心</span></button>
+    </div>
+    <label for="note">想寫低發生咩事嗎？（選填）</label>
+    <textarea id="note" maxlength="300" placeholder="呢段內容只係示範，會儲存在此瀏覽器。"></textarea>
+    <div class="row"><button id="saveMood" class="primary" disabled>儲存今日心情</button><span id="saveMsg" aria-live="polite"></span></div>
+  </section>
+  <section id="supportPanel" class="card support hidden" aria-live="polite">
+    <div><span class="eyebrow">你唔需要一個人面對</span><h3>想而家做邊一種支援？</h3></div>
+    <div class="support-grid">
+      <button id="startMeditation"><b>🧘 2分鐘呼吸練習</b><span>跟住圓圈慢慢呼吸</span></button>
+      <button id="connectEEG"><b>🧠 連接 EEG 設備</b><span>示範藍牙連接流程</span></button>
+      <a class="support-link" href="mailto:counsellor@school.edu.hk?subject=學生希望聯絡輔導員"><b>💬 聯絡網上輔導員</b><span>開啟學校指定聯絡渠道</span></a>
+    </div>
+    <p class="urgent">如你或其他人正身處即時危險，請立即聯絡可信任成人或致電 999。</p>
+  </section>
+  <section class="card">
+    <div class="section-head"><div><span class="eyebrow">最近30日</span><h3>我的情緒概覽</h3></div><div class="average"><b id="monthAvg">--</b><span>/ 5 平均</span></div></div>
+    <div id="studentChart" class="chart" aria-label="最近30日情緒圖"></div>
+    <p class="muted">圖表只顯示你在此裝置輸入的示範資料。</p>
+  </section>
+</section>
+<section id="staffView" class="view hidden">
+  <div class="hero card"><div><span class="eyebrow">老師／社工儀表板</span><h2>班級情緒概況</h2><p>只顯示班級匯總；轉介提示由獲授權社工跟進。</p></div><select id="classSelect" aria-label="選擇班別"><option>1A</option><option>1B</option><option>2A</option></select></div>
+  <div class="stats"><article class="card"><span>今日平均</span><b id="classAvg">--</b><small>/ 5</small></article><article class="card"><span>今日回應</span><b id="responseCount">--</b><small>人</small></article><article class="card warning"><span>需要留意</span><b id="riskCount">--</b><small>項提示</small></article></div>
+  <section class="card"><div class="section-head"><div><span class="eyebrow">最近7日</span><h3>每日班級平均心情</h3></div><span id="trendBadge" class="badge"></span></div><div id="classChart" class="chart class-chart"></div></section>
+  <section class="card"><div class="section-head"><div><span class="eyebrow">只供獲授權人員</span><h3>社工跟進提示</h3></div><button id="clearDemo" class="ghost">重設示範資料</button></div><div id="alerts"></div><p class="muted">提示不可取代專業判斷。聯絡學生前應按校本危機及私隱程序核實情況。</p></section>
+</section>
+</main>
+<div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-card"><button id="closeModal" class="close" aria-label="關閉">×</button><h3 id="modalTitle">呼吸練習</h3><div id="breathing"><div class="breath-circle">吸氣</div><p id="timer">02:00</p><button id="stopMeditation" class="ghost">結束練習</button></div><div id="eegPanel" class="hidden"><div class="device">🧠</div><p id="eegStatus">準備搜尋設備…</p><button id="simulateConnect" class="primary">模擬連接</button></div></div></div>
+<script src="app.js"></script>
+</body></html>
